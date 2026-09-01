@@ -2,16 +2,16 @@
 
 PDF Insight is a Retrieval-Augmented Generation (RAG) web app that lets you
 upload any PDF and instantly **ask it questions in plain English** or
-**generate a summary that scales to the document's own length** — combining
+**generate a summary that scales to the document's own length** combining
 fast local semantic search with Gemini for generation.
 
 Upload a research paper, a contract, a report, or lecture notes, and get
-grounded answers with the page number(s) they came from — not hallucinated
+grounded answers with the page number(s) they came from not hallucinated
 guesses.
 
 ---
-
-## ✨ Features
+## 🎥 Demo [Watch the demo](assets/demo.mp4)
+## Features
 
 - 🔍 **Semantic search over your document** using sentence embeddings, not
   brittle keyword matching
