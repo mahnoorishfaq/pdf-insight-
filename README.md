@@ -1,8 +1,8 @@
-# 📄 PDF Insight — AI-Powered Document Q&A & Summarization
+# PDF Insight AI-Powered Document Q&A & Summarization
 
 PDF Insight is a Retrieval-Augmented Generation (RAG) web app that lets you
 upload any PDF and instantly **ask it questions in plain English** or
-**generate a summary that scales to the document's own length** — combining
+**generate a summary that scales to the document's own length** combining
 fast local semantic search with Gemini for generation.
 
 Upload a research paper, a contract, a report, or lecture notes, and get
@@ -11,20 +11,20 @@ guesses.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔍 **Semantic search over your document** using sentence embeddings, not
+- **Semantic search over your document** using sentence embeddings, not
   brittle keyword matching
-- 💬 **Natural-language question answering**, grounded in retrieved context,
+- **Natural-language question answering**, grounded in retrieved context,
   with source page numbers
-- 📝 **Length-aware summarization** — a short document gets a short summary,
+- **Length-aware summarization** — a short document gets a short summary,
   a long or dense one gets a fuller, multi-paragraph summary, instead of a
   fixed word cap
-- ⚡ **Lightweight** — only a small embedding model runs locally; generation
+- **Lightweight** — only a small embedding model runs locally; generation
   is offloaded to the Gemini API, so there's no multi-gigabyte model download
-- 🖥️ Clean **Streamlit** interface with chat-style history
+- Clean **Streamlit** interface with chat-style history
 
-## 🧠 How it works
+## How it works
 
 ```
                 ┌────────────┐     ┌───────────────┐     ┌──────────────┐
@@ -45,14 +45,14 @@ guesses.
 2. **`embeddings.py`** embeds each chunk locally with `all-MiniLM-L6-v2` and
    indexes them in a FAISS similarity index — this part needs no API key.
 3. **`llm_engine.py`** embeds the user's question, retrieves the most
-   relevant chunks, and sends them to Gemini (`gemini-1.5-flash`) to generate
+   relevant chunks, and sends them to Gemini (`gemini-2.5-flash`) to generate
    a grounded answer — or, for summarization, sends the whole document (with
    a map-reduce fallback for very large ones) and asks for a summary scaled
    to its length.
 4. **`app.py`** ties it all together in a Streamlit UI, with the Gemini API
    key entered securely at runtime (never stored or committed).
 
-## 🛠️ Tech stack
+## Tech stack
 
 | Layer              | Tool                                          |
 |---------------------|------------------------------------------------|
@@ -60,10 +60,10 @@ guesses.
 | PDF parsing         | pdfplumber                                      |
 | Embeddings (local)  | sentence-transformers (`all-MiniLM-L6-v2`)      |
 | Vector search       | FAISS                                           |
-| Answer generation   | Google Gemini API (`gemini-1.5-flash`)          |
-| Summarization       | Google Gemini API (`gemini-1.5-flash`)          |
+| Answer generation   | Google Gemini API (`gemini-2.5-flash`)          |
+| Summarization       | Google Gemini API (`gemini-2.5-flash`)          |
 
-## 🚀 Getting started
+## Getting started
 
 ### 1. Clone and set up a virtual environment
 
@@ -71,7 +71,7 @@ guesses.
 git clone https://github.com/<your-username>/pdf-insight.git
 cd pdf-insight
 python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+source venv/Scripts/activate      # MacBook: venv\bin\activate
 ```
 
 ### 2. Install dependencies
@@ -86,7 +86,7 @@ Grab one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 (free tier available). Two ways to use it:
 
 - **Quick/one-off:** paste it into the app's sidebar at runtime. It's only
-  kept in that session's memory — never written to disk or committed.
+  kept in that session's memory never written to disk or committed.
 - **For your own dev machine:** copy `.env.example` to `.env` and put your
   key in there instead, so you don't have to re-type it every run:
   ```bash
@@ -94,7 +94,7 @@ Grab one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
   # then edit .env and set GEMINI_API_KEY=your_actual_key
   ```
   `.env` is already listed in `.gitignore`, so `git status` will never show
-  it as a tracked or staged file — it stays local and is never pushed, even
+  it as a tracked or staged file it stays local and is never pushed, even
   if the repo is public.
 
 ### 4. Run the app
@@ -112,7 +112,7 @@ The first run will download the small local embedding model
 pytest tests/
 ```
 
-## 📂 Project structure
+## Project structure
 
 ```
 pdf-insight/
