@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 from src.pdf_processor import Chunk
 
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.5-flash-lite"
 MAX_WORDS_SINGLE_PASS = 120_000
 
 
