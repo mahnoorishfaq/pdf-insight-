@@ -1,17 +1,3 @@
-"""
-PDF Insight — AI-Powered Document Q&A and Summarization
-=========================================================
-A Streamlit app that lets a user upload a PDF and either ask
-natural-language questions about it (answered via semantic search +
-an LLM) or get an automatically length-scaled summary. Retrieval
-(embeddings + FAISS) runs locally and lightweight; generation is
-powered by the Gemini API, so no large local model download is
-required.
-
-Run with:
-    streamlit run app.py
-"""
-
 import os
 import tempfile
 
@@ -22,9 +8,6 @@ from src.pdf_processor import process_pdf
 from src.embeddings import VectorStore
 from src.llm_engine import answer_question, summarize_chunks
 
-# Loads variables from a local .env file if one exists (it's gitignored,
-# so this is safe even when the repo is public). Does nothing if there's
-# no .env — e.g. for anyone else who clones the repo without one.
 load_dotenv()
 ENV_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
@@ -42,8 +25,6 @@ def get_vector_store():
 
 
 def process_uploaded_file(uploaded_file):
-    """Saves the upload to a temp file, extracts+chunks it, and
-    builds a fresh vector index for it."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(uploaded_file.read())
         tmp_path = tmp.name
