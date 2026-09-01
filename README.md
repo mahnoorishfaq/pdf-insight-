@@ -6,7 +6,7 @@ upload any PDF and instantly **ask it questions in plain English** or
 fast local semantic search with Gemini for generation.
 
 Upload a research paper, a contract, a report, or lecture notes, and get
-grounded answers with the page number(s) they came from — not hallucinated
+grounded answers with the page number(s) they came from not hallucinated
 guesses.
 
 ---
@@ -17,10 +17,10 @@ guesses.
   brittle keyword matching
 - **Natural-language question answering**, grounded in retrieved context,
   with source page numbers
-- **Length-aware summarization** — a short document gets a short summary,
+- **Length-aware summarization** a short document gets a short summary,
   a long or dense one gets a fuller, multi-paragraph summary, instead of a
   fixed word cap
-- **Lightweight** — only a small embedding model runs locally; generation
+- **Lightweight** only a small embedding model runs locally; generation
   is offloaded to the Gemini API, so there's no multi-gigabyte model download
 - Clean **Streamlit** interface with chat-style history
 
@@ -43,10 +43,10 @@ guesses.
 1. **`pdf_processor.py`** extracts text page-by-page and splits it into
    overlapping chunks so context isn't lost at chunk boundaries.
 2. **`embeddings.py`** embeds each chunk locally with `all-MiniLM-L6-v2` and
-   indexes them in a FAISS similarity index — this part needs no API key.
+   indexes them in a FAISS similarity index this part needs no API key.
 3. **`llm_engine.py`** embeds the user's question, retrieves the most
-   relevant chunks, and sends them to Gemini (`gemini-2.5-flash`) to generate
-   a grounded answer — or, for summarization, sends the whole document (with
+   relevant chunks, and sends them to Gemini (`gemini-3.5-flash-lite`) to generate
+   a grounded answer or, for summarization, sends the whole document (with
    a map-reduce fallback for very large ones) and asks for a summary scaled
    to its length.
 4. **`app.py`** ties it all together in a Streamlit UI, with the Gemini API
@@ -60,8 +60,8 @@ guesses.
 | PDF parsing         | pdfplumber                                      |
 | Embeddings (local)  | sentence-transformers (`all-MiniLM-L6-v2`)      |
 | Vector search       | FAISS                                           |
-| Answer generation   | Google Gemini API (`gemini-2.5-flash`)          |
-| Summarization       | Google Gemini API (`gemini-2.5-flash`)          |
+| Answer generation   | Google Gemini API (`gemini-3.5-flash-lite`)          |
+| Summarization       | Google Gemini API (`gemini-3.5-flash-lite`)          |
 
 ## Getting started
 
