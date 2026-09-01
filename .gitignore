@@ -1,0 +1,27 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Environment variables (your real Gemini API key lives here — never commit this)
+.env
+
+# Model cache (downloaded on first run — don't commit)
+.cache/
+*.faiss
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Sample uploads
+sample_docs/*.pdf
