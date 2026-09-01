@@ -1,28 +1,9 @@
-"""
-llm_engine.py
---------------
-Generation layer powered by Google's Gemini API. Replaces the old
-local extractive-QA / fixed-length summarization models with a
-hosted LLM that:
-  - answers questions in natural language, grounded in the chunks
-    retrieved by the VectorStore, citing source pages
-  - writes a summary whose length scales with the document instead
-    of being capped at a fixed word count
-
-Only an API key needs to be supplied at runtime (via the Streamlit
-sidebar) — nothing is hardcoded or committed to the repo.
-"""
-
 from typing import List, Tuple
 import google.generativeai as genai
 
 from src.pdf_processor import Chunk
 
 MODEL_NAME = "gemini-2.5-flash"
-
-# Gemini 1.5 Flash has roughly a 1M-token context window, comfortably
-# fitting most documents in one call. This is a conservative safety
-# cap (in words) so an unusually huge PDF doesn't blow past it.
 MAX_WORDS_SINGLE_PASS = 120_000
 
 
@@ -36,18 +17,6 @@ def answer_question(
     retrieved_chunks: List[Tuple[Chunk, float]],
     api_key: str,
 ) -> dict:
-    """
-    Generates a grounded, natural-language answer to the question
-    using only the retrieved chunks as context.
-
-    Args:
-        question: The user's question.
-        retrieved_chunks: Output of VectorStore.search().
-        api_key: The caller's Gemini API key.
-
-    Returns:
-        A dict with 'answer' (str) and 'pages' (sorted list of ints).
-    """
     if not retrieved_chunks:
         return {"answer": "I couldn't find anything relevant in the document.", "pages": []}
 
@@ -77,19 +46,6 @@ def answer_question(
 
 
 def summarize_chunks(chunks: List[Chunk], api_key: str) -> str:
-    """
-    Summarizes the whole document with length scaled to the
-    document's own length and density, rather than a fixed
-    max_length. Short documents get a couple of sentences; long or
-    dense ones get multiple paragraphs.
-
-    Args:
-        chunks: All chunks extracted from the document.
-        api_key: The caller's Gemini API key.
-
-    Returns:
-        A summary string.
-    """
     if not chunks:
         return "No text could be extracted from this document."
 
@@ -117,11 +73,6 @@ def summarize_chunks(chunks: List[Chunk], api_key: str) -> str:
 
 
 def _map_reduce_summarize(chunks: List[Chunk], api_key: str, section_words: int = 20_000) -> str:
-    """
-    For documents too large for a single call: summarizes the
-    document in sections, then summarizes those summaries together
-    into one coherent final summary.
-    """
     model = _get_model(api_key)
 
     sections: List[str] = []
