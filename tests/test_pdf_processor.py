@@ -6,6 +6,8 @@ Unit tests for src/pdf_processor.py. Run with:
 import sys
 import os
 
+import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.pdf_processor import chunk_text
@@ -45,3 +47,8 @@ def test_chunk_text_covers_all_words():
         all_chunked_words.update(chunk.split())
 
     assert all_chunked_words == set(words)
+
+
+def test_chunk_text_rejects_overlap_not_smaller_than_chunk_size():
+    with pytest.raises(ValueError):
+        chunk_text("some words here", chunk_size=10, overlap=10)

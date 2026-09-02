@@ -25,6 +25,9 @@ def chunk_text(
     chunk_size: int = 500,
     overlap: int = 100,
 ) -> List[str]:
+    if overlap >= chunk_size:
+        raise ValueError("overlap must be smaller than chunk_size")
+
     words = text.split()
     if not words:
         return []

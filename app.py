@@ -4,9 +4,11 @@ import tempfile
 import streamlit as st
 from dotenv import load_dotenv
 
+from sentence_transformers import SentenceTransformer
+
 from src.pdf_processor import process_pdf
-from src.embeddings import VectorStore
-from src.llm_engine import answer_question, summarize_chunks
+from src.embeddings import VectorStore, DEFAULT_MODEL_NAME
+from src.llm_engine import answer_question, summarize_chunks, GeminiAPIError
 
 load_dotenv()
 ENV_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -19,9 +21,12 @@ st.set_page_config(
 
 
 @st.cache_resource(show_spinner=False)
-def get_vector_store():
-    """Cached so the embedding model loads only once per session."""
-    return VectorStore()
+def get_embedding_model():
+    """Cached globally: the model is stateless and expensive to load, so
+    every session can safely share one instance. The per-document FAISS
+    index itself is NOT cached here — it lives in st.session_state so
+    concurrent users never share or clobber each other's document."""
+    return SentenceTransformer(DEFAULT_MODEL_NAME)
 
 
 def process_uploaded_file(uploaded_file):
@@ -34,7 +39,7 @@ def process_uploaded_file(uploaded_file):
     finally:
         os.remove(tmp_path)
 
-    store = get_vector_store()
+    store = VectorStore(model=get_embedding_model())
     store.build(chunks)
     return chunks, store
 
@@ -84,7 +89,13 @@ def main():
             st.session_state.store = store
             st.session_state.file_name = uploaded_file.name
             st.session_state.chat_history = []
-            st.success(f"Indexed {len(chunks)} chunks from '{uploaded_file.name}'.")
+            if chunks:
+                st.success(f"Indexed {len(chunks)} chunks from '{uploaded_file.name}'.")
+            else:
+                st.warning(
+                    f"No extractable text found in '{uploaded_file.name}'. "
+                    "It may be a scanned or image-only PDF without a text layer."
+                )
 
         if st.session_state.chunks:
             st.metric("Chunks indexed", len(st.session_state.chunks))
@@ -108,8 +119,13 @@ def main():
         if st.button("Ask", type="primary", disabled=not api_key) and question.strip():
             with st.spinner("Searching document and generating an answer..."):
                 retrieved = st.session_state.store.search(question, top_k=4)
-                result = answer_question(question, retrieved, api_key)
-            st.session_state.chat_history.append((question, result))
+                try:
+                    result = answer_question(question, retrieved, api_key)
+                except GeminiAPIError as exc:
+                    result = None
+                    st.error(str(exc))
+            if result is not None:
+                st.session_state.chat_history.append((question, result))
 
         for q, result in reversed(st.session_state.chat_history):
             with st.container(border=True):
@@ -123,8 +139,13 @@ def main():
         st.subheader("Document summary")
         if st.button("Generate summary", disabled=not api_key):
             with st.spinner("Summarizing document..."):
-                summary = summarize_chunks(st.session_state.chunks, api_key)
-            st.write(summary)
+                try:
+                    summary = summarize_chunks(st.session_state.chunks, api_key)
+                except GeminiAPIError as exc:
+                    summary = None
+                    st.error(str(exc))
+            if summary is not None:
+                st.write(summary)
 
 
 if __name__ == "__main__":
