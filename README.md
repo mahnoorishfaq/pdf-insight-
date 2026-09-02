@@ -45,7 +45,7 @@ guesses.
 2. **`embeddings.py`** embeds each chunk locally with `all-MiniLM-L6-v2` and
    indexes them in a FAISS similarity index — this part needs no API key.
 3. **`llm_engine.py`** embeds the user's question, retrieves the most
-   relevant chunks, and sends them to Gemini (`gemini-1.5-flash`) to generate
+   relevant chunks, and sends them to Gemini (`gemini-3.5-flash-lite`) to generate
    a grounded answer — or, for summarization, sends the whole document (with
    a map-reduce fallback for very large ones) and asks for a summary scaled
    to its length.
@@ -60,8 +60,8 @@ guesses.
 | PDF parsing         | pdfplumber                                      |
 | Embeddings (local)  | sentence-transformers (`all-MiniLM-L6-v2`)      |
 | Vector search       | FAISS                                           |
-| Answer generation   | Google Gemini API (`gemini-1.5-flash`)          |
-| Summarization       | Google Gemini API (`gemini-1.5-flash`)          |
+| Answer generation   | Google Gemini API (`gemini-3.5-flash-lite`)          |
+| Summarization       | Google Gemini API (`gemini-3.5-flash-lite`)          |
 
 ## 🚀 Getting started
 
