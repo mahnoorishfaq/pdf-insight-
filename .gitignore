@@ -25,3 +25,4 @@ env/
 
 # Sample uploads
 sample_docs/*.pdf
+*.mp4
