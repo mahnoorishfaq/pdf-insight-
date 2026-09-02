@@ -18,7 +18,7 @@ import google.generativeai as genai
 
 from src.pdf_processor import Chunk
 
-MODEL_NAME = "gemini-3.5-flash-lite"
+MODEL_NAME = "gemini-2.5-flash"
 
 # Gemini 1.5 Flash has roughly a 1M-token context window, comfortably
 # fitting most documents in one call. This is a conservative safety
