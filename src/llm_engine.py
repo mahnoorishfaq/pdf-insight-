@@ -7,9 +7,23 @@ MODEL_NAME = "gemini-3.5-flash-lite"
 MAX_WORDS_SINGLE_PASS = 120_000
 
 
+class GeminiAPIError(Exception):
+    """Raised when a Gemini API call fails, with a user-friendly message."""
+
+
 def _get_model(api_key: str):
     genai.configure(api_key=api_key)
     return genai.GenerativeModel(MODEL_NAME)
+
+
+def _generate(model, prompt: str) -> str:
+    """Calls the model and turns any failure into a friendly GeminiAPIError
+    instead of letting a raw exception crash the caller."""
+    try:
+        response = model.generate_content(prompt)
+    except Exception as exc:
+        raise GeminiAPIError(f"The Gemini API request failed: {exc}") from exc
+    return response.text.strip()
 
 
 def answer_question(
@@ -17,6 +31,18 @@ def answer_question(
     retrieved_chunks: List[Tuple[Chunk, float]],
     api_key: str,
 ) -> dict:
+    """
+    Generates a grounded, natural-language answer to the question
+    using only the retrieved chunks as context.
+
+    Args:
+        question: The user's question.
+        retrieved_chunks: Output of VectorStore.search().
+        api_key: The caller's Gemini API key.
+
+    Returns:
+        A dict with 'answer' (str) and 'pages' (sorted list of ints).
+    """
     if not retrieved_chunks:
         return {"answer": "I couldn't find anything relevant in the document.", "pages": []}
 
@@ -37,15 +63,28 @@ def answer_question(
     )
 
     model = _get_model(api_key)
-    response = model.generate_content(prompt)
+    answer = _generate(model, prompt)
 
     return {
-        "answer": response.text.strip(),
+        "answer": answer,
         "pages": sorted(set(pages)),
     }
 
 
 def summarize_chunks(chunks: List[Chunk], api_key: str) -> str:
+    """
+    Summarizes the whole document with length scaled to the
+    document's own length and density, rather than a fixed
+    max_length. Short documents get a couple of sentences; long or
+    dense ones get multiple paragraphs.
+
+    Args:
+        chunks: All chunks extracted from the document.
+        api_key: The caller's Gemini API key.
+
+    Returns:
+        A summary string.
+    """
     if not chunks:
         return "No text could be extracted from this document."
 
@@ -68,11 +107,15 @@ def summarize_chunks(chunks: List[Chunk], api_key: str) -> str:
         "and don't just restate the first page.\n\n"
         f"Document ({word_count} words):\n{full_text}"
     )
-    response = model.generate_content(prompt)
-    return response.text.strip()
+    return _generate(model, prompt)
 
 
 def _map_reduce_summarize(chunks: List[Chunk], api_key: str, section_words: int = 20_000) -> str:
+    """
+    For documents too large for a single call: summarizes the
+    document in sections, then summarizes those summaries together
+    into one coherent final summary.
+    """
     model = _get_model(api_key)
 
     sections: List[str] = []
@@ -93,8 +136,7 @@ def _map_reduce_summarize(chunks: List[Chunk], api_key: str, section_words: int 
             "Summarize this section of a larger document in 2-4 sentences, "
             "focusing on the key points:\n\n" + section
         )
-        response = model.generate_content(prompt)
-        section_summaries.append(response.text.strip())
+        section_summaries.append(_generate(model, prompt))
 
     combined = "\n\n".join(section_summaries)
     final_prompt = (
@@ -103,5 +145,4 @@ def _map_reduce_summarize(chunks: List[Chunk], api_key: str, section_words: int 
         "scaled to the overall length and complexity of the document. "
         "Remove redundancy between sections.\n\n" + combined
     )
-    final_response = model.generate_content(final_prompt)
-    return final_response.text.strip()
+    return _generate(model, final_prompt)
