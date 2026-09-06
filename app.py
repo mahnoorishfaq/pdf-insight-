@@ -24,7 +24,7 @@ st.set_page_config(
 def get_embedding_model():
     """Cached globally: the model is stateless and expensive to load, so
     every session can safely share one instance. The per-document FAISS
-    index itself is NOT cached here — it lives in st.session_state so
+    index itself is NOT cached here it lives in st.session_state so
     concurrent users never share or clobber each other's document."""
     return SentenceTransformer(DEFAULT_MODEL_NAME)
 
@@ -47,7 +47,7 @@ def process_uploaded_file(uploaded_file):
 def main():
     st.title("📄 PDF Insight")
     st.caption(
-        "Upload a PDF, then ask it questions or generate a summary — "
+        "Upload a PDF, then ask it questions or generate a summary "
         "local semantic search paired with Gemini for generation."
     )
 
