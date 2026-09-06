@@ -142,5 +142,5 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE).
 
 ---
 
-Built by **Mahnoor** — BS Artificial Intelligence, Government College
+Built by **Mahnoor Ishfaq** — BS Artificial Intelligence, Government College
 University (GCU) Lahore.
