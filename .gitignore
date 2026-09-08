@@ -11,12 +11,10 @@ env/
 .cache/
 *.faiss
 
-# OS / editor
 .DS_Store
 .vscode/
 .idea/
 
-# Sample uploads
 sample_docs/*.pdf
 
 # Videos, except the README demo clip
