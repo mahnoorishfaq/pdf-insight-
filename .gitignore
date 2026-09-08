@@ -6,13 +6,8 @@ venv/
 .venv/
 env/
 
-# Streamlit
 .streamlit/secrets.toml
-
-# Environment variables (your real Gemini API key lives here — never commit this)
 .env
-
-# Model cache (downloaded on first run — don't commit)
 .cache/
 *.faiss
 
