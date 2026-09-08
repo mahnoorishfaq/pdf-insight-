@@ -17,6 +17,5 @@ env/
 
 sample_docs/*.pdf
 
-# Videos, except the README demo clip
 *.mp4
 !assets/demo.mp4
