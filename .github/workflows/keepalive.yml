@@ -1,0 +1,40 @@
+name: Keep Streamlit App Awake
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:          # lets you trigger it manually to test
+
+permissions:
+  contents: write            # needed so the workflow can commit the heartbeat
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Visit app and wake it if asleep
+        env:
+          APP_URL: https://heudsq5tmtlky8qpi5skug.streamlit.app/
+        run: python .github/workflows/wake_app.py
+
+      - name: Record heartbeat
+        run: date -u +"%Y-%m-%dT%H:%M:%SZ" > .last-run
+
+      - name: Commit heartbeat
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .last-run
+          git commit -m "keepalive heartbeat" || echo "nothing to commit"
+          git push
